@@ -1,0 +1,313 @@
+---
+---
+---
+
+# **Devoir à la maison**
+
+## **Exercice 1**
+
+#### Question 1
+
+```{r}
+x=runif(1000,0,10)
+y=3*x+1+rnorm(1000,0,1)
+```
+
+#### **Question 2**
+
+```{r}
+plot(x,y,main="Nuage de Points")
+```
+
+##### Je vois que dans ce nuage de point ci-dessus les points du couple(x,y) forment une droite linéaire.
+
+#### Question 3
+
+$$
+\arg \min _{a, b} \sum_{i=1}^{n}\left|a x_{i}+b-y_{i}\right|^{2}
+$$ Pour derivé cette équation ci-dessus, on va mettre en place une fonction $L$
+
+$$
+L(a, b)=\sum_{i=1}^{n}\left|a x_{i}+b-y_{i}\right|^{2}
+$$
+
+la fonction $L$ est une fonction de deux variables réelles ses points critiques sont obtenus par la réalisation du système:
+
+$$
+\begin{aligned}
+&\frac{\partial L(a, b)}{\partial a}=0 \\
+&\frac{\partial L(a, b)}{\partial b}=0
+\end{aligned}
+$$ $$
+\begin{aligned}
+&\frac{\partial L(a, b)}{\partial b}=0 \Leftrightarrow 2 \times(1) \times \sum_{i=1}^{n}\left(a x_{i}+b-y_{i}\right)=0\\
+&\Leftrightarrow \sum_{i=1}^{n}\left(a x_{i}+b-y_{i}\right)=0 \Leftrightarrow \sum_{i=1}^{n} a x_{i}+\sum_{i=1}^{n} b-\sum_{i=1}^{n} y_{i}=0\\
+&\Leftrightarrow \sum_{i=1}^{n} b=\sum_{i=1}^{n} y_{i}-\sum_{i=1}^{n} a x_{i} \quad \text { or on sait que } \frac{1}{n} \sum_{i=1}^{n} x_{i}=\bar{x} \Leftrightarrow n \bar{x}=\sum_{i=1}^{n} x_{i}\\
+&\text { et on sait que } \bar{y}=\frac{1}{n} \sum_{i=1}^{n} y_{i} \Leftrightarrow n \bar{y}=\sum_{i=1}^{n} y_{i}\\
+&\Rightarrow n b=n \bar{y}-an \bar{x}\\
+&\Leftrightarrow \hat{b}=\bar{y}-\hat{a} \bar{x}
+\end{aligned}
+$$ Maintenant après avoir trouvé la valeur $\hat{b}$, on va estimer la valeur de $\hat{a}$. $$
+\begin{aligned}
+&\frac{\partial L(a, b)}{\partial a}=0 \\
+&\Leftrightarrow 2 \times\left(x_{i}\right) \times\left(\sum_{i=1}^{n}\left(a x_{i}+b-y_{i}\right)\right)=0
+\end{aligned}
+$$ $$
+\begin{aligned}
+&\Leftrightarrow \sum_{i=1}^{n} a x_{i}{ }^{2}+b \sum_{i=1}^{n} x_{i}-\sum_{i=1}^{n} x_{i} y_{i}=0 \\
+&\Leftrightarrow \sum_{i=1}^{n} a x_{i}^{2}+(\bar{y}-a \bar{x}) \sum_{i=1}^{n} x_{i}-\sum_{i=1}^{n} x_{i} y_{i}=0 \\
+&\Leftrightarrow \sum_{i=1}^{n} a x_{i}^{2}+(\bar{y}-a \bar{x}) n \bar{x}-\sum_{i=1}^{n} x_{i} y_{i}=0 \\
+&\Leftrightarrow \sum_{i=1}^{n} a x_{i}^{2}+n \bar{x} \bar{y}-a n \bar{x}^{2}-\sum_{i=1}^{n} x_{i} y_{i}=0
+\end{aligned}
+$$ $$
+\begin{aligned}
+&\Leftrightarrow a\left(\sum_{i=1}^{n} x_{i}^{2}-n \bar{x}^{2}\right)-\sum_{i=1}^{n} x_{i} y_{i}+n \bar{x} \bar{y}=0 \\
+&\Leftrightarrow a \left( \sum_{i=1}^{n} x_{i}^{2}-n \bar{x}^{2}\right)=\sum_{i=1}^{n} x_{i} y_{i}-n \bar{x} \bar{y} \\
+&\Leftrightarrow a=\frac{\sum_{i=1}^{n} x_{i} y_{i}-n \bar{x} \bar{y}}{\sum_{i=1}^{n} x_{i}^{2}-n \bar{x}^{2}} \\
+&\Leftrightarrow \hat{a}=\frac{\operatorname{cov}\left(x,y\right)}{\operatorname{Var}(x)}
+\end{aligned}
+$$
+
+#### Question 4
+
+```{r}
+moindrescarres=function(x,y){
+  a=cov(x,y)/var(x)
+  b=mean(y)-a*mean(x)
+  return(list(a=a,b=b))
+}
+moindrescarres(x,y)
+
+```
+
+#### Question 5
+
+```{r}
+res1 = moindrescarres(x,y)
+plot(x,y,main="les points (xi,yi) et la droite de régression v = at + b")
+abline(a=res1$b,b=res1$a,col="red",lwd=4)
+```
+
+##### Après avoir estimé la pente (a) et l'intercept (b) de ma droite de regression linéaire,j'ai tracé ma droite de moindres carrés de y en x en utilisant des données non-aberrantes et je trouve que les points du couple(x,y) sont tous alignés au long de la droite de regression , cela me permet de remarqué que mon modèle de regression linéaire estime à 100% la valeur exacte de y quelque soit la valeur prise par x.
+
+#### Question 6
+
+```{r}
+v_a=runif(1000/3,min=0,max=30)
+
+y[sample(1:length(y),1000/3,replace=FALSE)]=v_a
+
+```
+
+##### Puisque maintenant je possède une nouvelle donnée avec des données aberrantes alors je vais réestimé à l'aide de ma fonction de moindres carrés la pente(a) et l'intercept(b) pour trouvé une nouvelle droite de regression linéaire.
+
+```{r}
+res2 = moindrescarres(x,y)
+plot(x,y,main="les points (xi,yi) et la droite de régression v = at + b")
+abline(a=res2$b,b=res2$a,col="red",lwd=4)
+```
+
+##### **On voit que dans ce nuage de point, ma droite de moindres carrés n'estime pas bien la valeur de y quand il y a la présence des données aberrantes.**
+
+## 
+
+## **Exercice 2**
+
+#### Question 1
+
+```{r}
+droite=function(x1,y1,x2,y2){
+  x12=c(x1,x2)
+  y12=c(y1,y2)
+  
+  a=cov(x12,y12)/var(x12)
+  b=mean(y12)-a*mean(x12)
+  
+  return(c(a=a,b=b))
+}
+droite(3,2,5,7)
+```
+
+#### Question 2
+
+```{r}
+ransac=function(x,y,alpha=1,M=10^3,P){
+  
+  while(length(x) != length(y)){
+    stop("Vous aviez entré deux vecteurs de tailles différents donc veuiller s'il vous plaît entrer deux vecteurs de même taille")
+  }
+  
+  n=length(x)
+  B=0
+  
+  for(k in 1:M){
+    
+    l=sample(1:n,1)
+    j=sample(1:n,1)
+    
+    ab=droite(x[l],y[l],x[j],y[j])
+    
+    ck=which(abs(ab["a"]*x+ab["b"]-y)<=alpha)
+    
+    if(length(ck)>max(P,B)){
+      c=ck
+      B=length(c)
+      a=ab["a"]
+      b=ab["b"]
+    }
+    
+  }
+  
+  return(list(C=c,a=a,b=b))
+}
+```
+
+##### Dans la fonction Ransac,il faut que l'utilisateur précise la valeur du seuil P parceque ce n'est pas énoncé dans l'exercice.
+
+#### Question 3
+
+```{r}
+res3=ransac(x,y,alpha=1,M=10^3,10)
+plot(x,y)
+abline(a=res3$b,b=res3$a,col="red",lwd=4)
+abline(a=res2$b,b=res2$a,col="blue",lwd=4)
+legend("topleft",legend=c("Droite de Ransac","Droite de Moindre Carrée"),text.col=c("red","blue"),col=c("red", "blue"), lwd=3, cex=0.8)
+```
+
+##### Je vois que la droite de regression v=at+b trouvée par Ransac et la droite de regression trouvée précédemment par moindres carrés sont totalement différents par conséquent il semble que la droite de regression v=at+b trouvé par Ransac estime mieux la valeur de y quand il y a la présence des données aberrantes alors qu'avec la méthode de moindres carrés, on n'obtenais pas un modèle qui estime bien la valeur de y s'il y avait la présence des données aberrantes.
+
+############# **Question 4**
+
+##### Dans cette question , je suppose que mon paramètre P est la proportion de données aberrantes
+
+```{r}
+res5=ransac(x,y,alpha=2,M=10^4,P=1/6)
+res6=ransac(x,y,alpha=3,M=10^2,P=1/8)
+res7=ransac(x,y,alpha=5,M=10^3,P=1/3)
+list(res5,res6,res7)
+```
+
+###### je Testé la stabilité de l'algorithme pour plusieurs valeurs de M, du seuil α, et en fonction de la proportion p de données aberrantes et cela me fait conclure qu'on n'obtient pas le même résultat alors par conséquence on peut être certain que si on tire aléatoirement des couples de points à chaque itération, le résultat final de Ransac n'est pas forcément le même, si on le lance plusieurs fois sur les mêmes données.
+
+#### 
+
+## **Exercice 3**
+
+#### Question 1
+
+```{r}
+u <- cbind(1 + rnorm(500), 5 + rnorm(500))
+v <- cbind(4 + rnorm(500), 1 + rnorm(500))
+w <- cbind(4 + rnorm(500), 7 + rnorm(500))
+P <- rbind(u, v, w)
+colnames(P) <- c("x","y")
+plot(P)
+```
+
+##### **"rnorm(500)" est une fonction qui permet de generé un vecteur de nombre aléatoire normalement distribué et dont notre cas n=500.**
+
+##### **u est une matrice obtenu grâce à la fusion des colonnes ,c'est à dire en rajoutant des nouvelles colonnes.**
+
+##### **u est obtenu grâce à la fusion de deux vecteurs qui sont géneré par une loi normale centré reduite.**
+
+##### **Idem pour les matrices v et w.**
+
+##### **Mais la matrice P est obtenu grâce à la fusion des lignes ,c'est à dire en rajoutant des nouvelles lignes. P est obtenu grâce à la fusion des 3 matrices u,v et w.**
+
+##### **"plot(P)" permet de visualiser les points appartenant à la matrice P grâce à un nuage de point.**
+
+#### Question 2
+
+```{r}
+kmeans <- function(P, K, max_iter = 50) {
+  
+  N <- nrow(P)
+  
+  ## initialisation
+  
+  if (FALSE) { 
+    
+    moyenne_P <- apply(P, 2, mean)
+    
+    distance_to_mean_P <- apply(P, 1, function(row) {abs(row - moyenne_P)})
+    
+    
+    
+    max_distance_to_mean_P <- max(distance_to_mean_P)
+    
+    moyenne_groupe <- matrix(runif(2 * K, 
+                       min = -max_distance_to_mean_P, 
+                       max = max_distance_to_mean_P), 
+                 ncol = 2)
+    
+    
+    
+    moyenne_groupe <- moyenne_groupe + matrix(moyenne_P, nrow = K, ncol = 2, byrow = TRUE)
+    
+  } else { 
+    moyenne_groupe <- P[sample(1:N, K, replace = FALSE), ]
+  }
+  
+  
+  
+  ## Mise à jour 
+  
+  distances <- matrix(NA, nrow = N, ncol = K)
+  
+  compare_moyenne_groupe <- matrix(NA, nrow = K, ncol = K)
+  
+  iter <- 0
+  
+  meme_moyenne <- FALSE
+  
+  while (iter <= max_iter & !meme_moyenne) {
+    iter <- iter + 1
+    moyenne_groupe_ancien <- moyenne_groupe
+    for (kk in 1:K) {
+      distances[, kk] <- apply(P - matrix(moyenne_groupe[kk, ], ncol = 2, nrow = N, byrow = TRUE),
+                               1, norm, type = "2")
+    }
+    
+    ## Mise à jour des groupes
+    
+    groups <- apply(distances, 1, which.min)
+    
+    ##  Mise à jour des moyennes
+    
+    for (kk in 1:K) {
+      idx <- (groups == kk)
+      if (length(idx) > 0) {
+        moyenne_groupe[kk, ] <- apply(P[idx, , drop = FALSE], 2, mean)
+      }
+    }
+    
+    
+    moyen_groupe_nouveau <- moyenne_groupe
+    for (kk in 1:K) {
+      compare_moyenne_groupe[, kk] <- apply(moyenne_groupe_ancien - matrix(moyen_groupe_nouveau[kk, ], ncol = 2, nrow = K, byrow = TRUE),
+                                1, norm, type = "2")
+    }
+    meme_moyenne <- all(apply(compare_moyenne_groupe, 1, min) <= 1e-6)
+    groups <- apply(distances, 1, which.min)
+  }
+  
+
+  return(list(groups = groups, moyenne_groupe = moyenne_groupe, iter = iter))
+}
+
+```
+
+#### Question 3
+
+```{r}
+test=kmeans(P,3)
+
+library(tidyverse)
+
+figure <- as_tibble(P) %>% 
+  bind_cols(groups=factor(test$groups)) %>%
+  ggplot() +
+  geom_point(aes(x=x,y=y,color=groups))+
+  geom_point(data=as_tibble(test$moyenne_groupe),aes(x=x,y=y),color="black",cex=2)
+figure
+```
